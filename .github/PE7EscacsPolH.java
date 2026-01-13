@@ -7,6 +7,7 @@ public class PE7EscacsPolH {
     }
 
     Scanner scanner = new Scanner(System.in);
+    String peça = "";
 
     public void principal() {
         System.out.println("ESCACS");
@@ -22,6 +23,7 @@ public class PE7EscacsPolH {
     }
 
     public void inserirPeces(char[][] tauler, boolean[][] blancNegre) {
+        /* Inserir espai buit '-' */
         for (int fila = 0; fila < 8; fila++) {
             for (int colum = 0; colum < 8; colum++) {
                 tauler[fila][colum] = '-';
@@ -41,7 +43,7 @@ public class PE7EscacsPolH {
         for (int colum = 0; colum < 8; colum++) {
             tauler[6][colum] = 'P';
         }
-        /* Inserir Caballs */
+        /* Inserir Cavalls */
         tauler[7][6] = 'C';
         tauler[7][1] = 'C';
         tauler[0][6] = 'c';
@@ -62,8 +64,6 @@ public class PE7EscacsPolH {
         /* Inserir Reis */
         tauler[0][4] = 'k';
         tauler[7][4] = 'K';
-
-        /* Asignar Blanc o Negre */
 
     }
 
@@ -90,29 +90,33 @@ public class PE7EscacsPolH {
     public void jugar(char[][] tauler, boolean[][] blancNegre) {
         System.out.print("Introdueix coordenada (ex: 2H): ");
 
-        
-        boolean error = false;
+        boolean errorCoord = false;
         int filaTemp;
         int columna;
         int fila;
-        do{
+        do {
             String entrada = scanner.nextLine().toUpperCase();
-        error= false;
-        filaTemp = Character.getNumericValue(entrada.charAt(0));
-        columna = entrada.charAt(1) - 'A';
-        /* Invertir fila */
-        fila = 8 - filaTemp;
-        columna++;
-        if(fila<0 ||fila>7 || columna<0 ||columna>7){
-            System.out.println("Introdueix entre '1A' i '8H'");
-            error=true;
-        }
-        }while(error);
-        System.out.println("Fila: " + filaTemp);
-        System.out.println("Columna: " + columna);
+            errorCoord = false;
+            filaTemp = Character.getNumericValue(entrada.charAt(0));
+            columna = entrada.charAt(1) - 'A';
+            /* Invertir fila */
+            fila = 8 - filaTemp;
+
+            if (fila < 0 || fila > 7 || columna < 0 || columna > 7) {
+                System.out.println("Introdueix entre '1A' i '8H'");
+                errorCoord = true;
+            }
+
+            peça = identificarPeça(tauler, fila, columna);
+            if (peça.equals("null")) {
+                System.out.println("L'ubicació seleccionada està buida, torna a triar.");
+                System.out.println("");
+                errorCoord = true;
+            }
+        } while (errorCoord);
 
         String color = blancONegre(blancNegre, fila, columna);
-        System.out.println("La peça seleccionada es " + color);
+        System.out.println("La peça seleccionada es " + peça + " " + color);
         configTorns(tauler);
     }
 
@@ -126,4 +130,24 @@ public class PE7EscacsPolH {
         return color;
     }
 
+    public String identificarPeça(char[][] tauler, int fila, int columna) {
+        String p = "";
+        if (tauler[fila][columna] == 'p' || tauler[fila][columna] == 'P') {
+            p = "peó";
+        } else if (tauler[fila][columna] == 'k' || tauler[fila][columna] == 'K') {
+            p = "rei";
+        } else if (tauler[fila][columna] == 'q' || tauler[fila][columna] == 'Q') {
+            p = "reina";
+        } else if (tauler[fila][columna] == 'c' || tauler[fila][columna] == 'C') {
+            p = "cavall";
+        } else if (tauler[fila][columna] == 't' || tauler[fila][columna] == 'T') {
+            p = "torre";
+        } else if (tauler[fila][columna] == 'a' || tauler[fila][columna] == 'A') {
+            p = "alfil";
+        } else if (tauler[fila][columna] == '-') {
+            p = "null";
+        }
+        return p;
+
+    }
 }
