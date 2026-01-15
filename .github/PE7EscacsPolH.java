@@ -8,7 +8,7 @@ public class PE7EscacsPolH {
 
     Scanner scanner = new Scanner(System.in);
     String peça = "";
-    int modeCasella=0;
+    int modeCasella = 0;
 
     public void principal() {
 
@@ -17,7 +17,7 @@ public class PE7EscacsPolH {
         char[][] tauler = new char[8][8];
         boolean[][] blancNegre = new boolean[8][8]; // true=blanc false=negre
         inserirPeces(tauler, blancNegre);
-        imprimirTauler(tauler);
+        
 
         jugar(tauler, blancNegre);
 
@@ -32,7 +32,8 @@ public class PE7EscacsPolH {
         int fila = 0;
         String color = "";
         while (actiu) {
-            modeCasella=0;
+            imprimirTauler(tauler);
+            modeCasella = 0;
             if (ronda % 2 == 0) {
                 torn = "negre";
             } else {
@@ -61,7 +62,7 @@ public class PE7EscacsPolH {
 
             System.out.println("A quina posicio vols moure't?");
 
-            moviments(tauler, color, fila, columna, ronda, errorCoord, filaTemp, coordenades, blancNegre);
+            moviments(tauler, color, fila, columna, ronda, errorCoord, filaTemp, coordenades, blancNegre, peça);
             ronda++;
         }
 
@@ -114,17 +115,19 @@ public class PE7EscacsPolH {
 
     public void imprimirTauler(char[][] tauler) {
         int n = 8;
+        System.out.println("| ┌─────────────────┐");
         for (int fila = 0; fila < 8; fila++) {
-            System.out.print(n + "|");
+            System.out.print("|"+n + "| ");
             for (int colum = 0; colum < 8; colum++) {
 
                 System.out.print(tauler[fila][colum] + " ");
             }
+            System.out.print("|");
             System.out.println("");
             n--;
         }
-        System.out.println("/|///////////////");
-        System.out.println("/|A B C D E F G H");
+        System.out.println("| └─────────────────┘");
+        System.out.println("|   A B C D E F G H ");
         System.out.println("");
     }
 
@@ -162,14 +165,29 @@ public class PE7EscacsPolH {
     }
 
     public void moviments(char[][] tauler, String color, int fila, int columna, int ronda, boolean errorCoord,
-            int filaTemp, int[] coordenades, boolean[][] blancNegre) {
-        comprovarCasella(errorCoord, filaTemp, columna, fila, tauler, blancNegre, coordenades);
-        fila = coordenades[0];
-        columna = coordenades[1];
-        if(peça.equals("null")){
+            int filaTemp, int[] coordenades, boolean[][] blancNegre, String peça) {
+        int novaFila = 0;
+        int novaColum = 0;
+        comprovarCasella(errorCoord, filaTemp, novaColum, novaFila, tauler, blancNegre, coordenades);
+        novaFila = coordenades[0];
+        novaColum = coordenades[1];
+        if(tauler[fila][columna] == 'p' || tauler[fila][columna] == 'P'){
+            if(columna==novaColum&&novaFila==(fila-1)){
+                tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre);
+            }
+            else {
+                System.out.println("mal");
+            }
             
         }
-        else{
+        
+         if (peça.equals("null")) {
+            if(columna==novaColum){}
+            System.out.println("La casella està buida, tot correcte\n");
+            tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre);
+            
+            
+        } else {
             System.out.println("");
         }
     }
@@ -189,16 +207,23 @@ public class PE7EscacsPolH {
                 errorCoord = true;
             } else {
                 peça = identificarPeça(tauler, fila, columna);
-                if(modeCasella==0){
-                if (peça.equals("null")) {
-                    System.out.println("L'ubicació seleccionada està buida, torna a triar.");
-                    errorCoord = true;
+                if (modeCasella == 0) {
+                    if (peça.equals("null")) {
+                        System.out.println("L'ubicació seleccionada està buida, torna a triar.");
+                        errorCoord = true;
+                    }
+                    modeCasella++;
                 }
-            modeCasella++;}
             }
         } while (errorCoord);
 
         coordenades[0] = fila;
         coordenades[1] = columna;
     }
+
+public void tramitCanvis(char[][] tauler,int novaFila,int novaColum,int fila,int columna, boolean[][] blancNegre){
+    tauler[novaFila][novaColum] = tauler[fila][columna];
+            tauler[fila][columna] = '-';
+            blancNegre[novaFila][novaColum] = blancNegre[fila][columna];
+}
 }
