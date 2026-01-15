@@ -8,17 +8,62 @@ public class PE7EscacsPolH {
 
     Scanner scanner = new Scanner(System.in);
     String peça = "";
+    int modeCasella=0;
 
     public void principal() {
+
         System.out.println("ESCACS");
         System.out.println("");
         char[][] tauler = new char[8][8];
         boolean[][] blancNegre = new boolean[8][8]; // true=blanc false=negre
         inserirPeces(tauler, blancNegre);
         imprimirTauler(tauler);
-        Scanner scanner = new Scanner(System.in);
 
         jugar(tauler, blancNegre);
+
+    }
+
+    public void jugar(char[][] tauler, boolean[][] blancNegre) {
+        int ronda = 1;
+        String torn = "";
+        boolean actiu = true;
+        int filaTemp = 0;
+        int columna = 0;
+        int fila = 0;
+        String color = "";
+        while (actiu) {
+            modeCasella=0;
+            if (ronda % 2 == 0) {
+                torn = "negre";
+            } else {
+                torn = "blanc";
+            }
+            System.out.println("Torn de: " + torn);
+            System.out.print("Introdueix coordenada (ex: 2H): ");
+
+            boolean errorCoord = false;
+            boolean errorColor = false;
+            int[] coordenades = new int[2]; // Array per guardar fila i columna
+            do {
+                errorColor = false;
+                comprovarCasella(errorCoord, filaTemp, columna, fila, tauler, blancNegre, coordenades);
+                fila = coordenades[0];
+                columna = coordenades[1];
+
+                color = blancONegre(blancNegre, fila, columna);
+                System.out.println("La peça seleccionada es " + peça + " " + color);
+                if (!color.equals(torn)) {
+                    System.out.println("Has de seleccionar una peça del teu color!");
+                    errorColor = true;
+                }
+
+            } while (errorColor);
+
+            System.out.println("A quina posicio vols moure't?");
+
+            moviments(tauler, color, fila, columna, ronda, errorCoord, filaTemp, coordenades, blancNegre);
+            ronda++;
+        }
 
     }
 
@@ -83,47 +128,10 @@ public class PE7EscacsPolH {
         System.out.println("");
     }
 
-    public void configTorns(char[][] tauler) {
-
-    }
-
-    public void jugar(char[][] tauler, boolean[][] blancNegre) {
-        System.out.print("Introdueix coordenada (ex: 2H): ");
-
-        boolean errorCoord = false;
-        int filaTemp;
-        int columna;
-        int fila;
-        do {
-            String entrada = scanner.nextLine().toUpperCase();
-            errorCoord = false;
-            filaTemp = Character.getNumericValue(entrada.charAt(0));
-            columna = entrada.charAt(1) - 'A';
-            /* Invertir fila */
-            fila = 8 - filaTemp;
-
-            if (fila < 0 || fila > 7 || columna < 0 || columna > 7) {
-                System.out.println("Introdueix entre '1A' i '8H'");
-                errorCoord = true;
-            }
-
-            peça = identificarPeça(tauler, fila, columna);
-            if (peça.equals("null")) {
-                System.out.println("L'ubicació seleccionada està buida, torna a triar.");
-                System.out.println("");
-                errorCoord = true;
-            }
-        } while (errorCoord);
-
-        String color = blancONegre(blancNegre, fila, columna);
-        System.out.println("La peça seleccionada es " + peça + " " + color);
-        configTorns(tauler);
-    }
-
     public String blancONegre(boolean[][] blancNegre, int fila, int columna) {
         String color = "";
         if (blancNegre[fila][columna]) {
-            color = "blanca";
+            color = "blanc";
         } else {
             color = "negre";
         }
@@ -146,8 +154,51 @@ public class PE7EscacsPolH {
             p = "alfil";
         } else if (tauler[fila][columna] == '-') {
             p = "null";
+        } else {
+            System.out.println("Insereix alguna coordenada real");
         }
         return p;
 
+    }
+
+    public void moviments(char[][] tauler, String color, int fila, int columna, int ronda, boolean errorCoord,
+            int filaTemp, int[] coordenades, boolean[][] blancNegre) {
+        comprovarCasella(errorCoord, filaTemp, columna, fila, tauler, blancNegre, coordenades);
+        fila = coordenades[0];
+        columna = coordenades[1];
+        if(peça.equals("null")){
+            
+        }
+        else{
+            System.out.println("");
+        }
+    }
+
+    public void comprovarCasella(boolean errorCoord, int filaTemp, int columna, int fila, char[][] tauler,
+            boolean[][] blancNegre, int[] coordenades) {
+
+        do {
+            String entrada = scanner.nextLine().toUpperCase();
+            errorCoord = false;
+            filaTemp = Character.getNumericValue(entrada.charAt(0));
+            columna = entrada.charAt(1) - 'A';
+            fila = 8 - filaTemp;
+
+            if (fila < 0 || fila > 7 || columna < 0 || columna > 7) {
+                System.out.println("Introdueix entre '1A' i '8H'");
+                errorCoord = true;
+            } else {
+                peça = identificarPeça(tauler, fila, columna);
+                if(modeCasella==0){
+                if (peça.equals("null")) {
+                    System.out.println("L'ubicació seleccionada està buida, torna a triar.");
+                    errorCoord = true;
+                }
+            modeCasella++;}
+            }
+        } while (errorCoord);
+
+        coordenades[0] = fila;
+        coordenades[1] = columna;
     }
 }
