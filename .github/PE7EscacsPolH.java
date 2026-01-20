@@ -183,12 +183,29 @@ public class PE7EscacsPolH {
             comprovarCasella(filaTemp, novaColum, novaFila, tauler, blancNegre, coordenades);
             novaFila = coordenades[0];
             novaColum = coordenades[1];
-            if (tauler[fila][columna] == 'p' || tauler[fila][columna] == 'P') {
+            if (peça.equals("reina")) {
+                movimentReina(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, peça, novaFila,
+                        novaColum, orientacio, doblecasella, posibleLocations);
+            }
+
+            if (peça.equals("peó")) {
                 movimentPeo(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, peça, novaFila,
                         novaColum, orientacio, doblecasella);
             }
-            if (tauler[fila][columna] == 't' || tauler[fila][columna] == 'T') {
+            if (peça.equals("torre")) {
                 movimentTorre(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, peça, novaFila,
+                        novaColum, orientacio, doblecasella, posibleLocations);
+            }
+            if (peça.equals("alfil")) {
+                movimentAlfil(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, peça, novaFila,
+                        novaColum, orientacio, doblecasella, posibleLocations);
+            }
+            if (peça.equals("cavall")) {
+                movimentCavall(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, peça, novaFila,
+                        novaColum, orientacio, doblecasella, posibleLocations);
+            }
+            if (peça.equals("rei")) {
+                movimentRei(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, peça, novaFila,
                         novaColum, orientacio, doblecasella, posibleLocations);
             }
 
@@ -200,24 +217,30 @@ public class PE7EscacsPolH {
 
         do {
             String entrada = scanner.nextLine().toUpperCase();
+            System.out.println("Has d'escriure 2 carácters");
+            System.out.print("> ");
             errorCoord = false;
-            filaTemp = Character.getNumericValue(entrada.charAt(0));
-            columna = entrada.charAt(1) - 'A';
-            fila = 8 - filaTemp;
-
-            if (fila < 0 || fila > 7 || columna < 0 || columna > 7) {
-                System.out.println("Introdueix entre '1A' i '8H'");
-                System.out.print("> ");
+            if (entrada.length() != 2) {
                 errorCoord = true;
             } else {
-                peça = identificarPeça(tauler, fila, columna);
-                if (modeCasella == 0) {
-                    if (peça.equals("null")) {
-                        System.out.println("L'ubicació seleccionada està buida, torna a triar.");
-                        System.out.print("> ");
-                        errorCoord = true;
+                filaTemp = Character.getNumericValue(entrada.charAt(0));
+                columna = entrada.charAt(1) - 'A';
+                fila = 8 - filaTemp;
+
+                if (fila < 0 || fila > 7 || columna < 0 || columna > 7) {
+                    System.out.println("Introdueix entre '1A' i '8H'");
+                    System.out.print("> ");
+                    errorCoord = true;
+                } else {
+                    peça = identificarPeça(tauler, fila, columna);
+                    if (modeCasella == 0) {
+                        if (peça.equals("null")) {
+                            System.out.println("L'ubicació seleccionada està buida, torna a triar.");
+                            System.out.print("> ");
+                            errorCoord = true;
+                        }
+                        modeCasella++;
                     }
-                    modeCasella++;
                 }
             }
         } while (errorCoord);
@@ -342,11 +365,169 @@ public class PE7EscacsPolH {
         }
 
         // Comprovar si el moviment és vàlid
+        if (tauler[fila][columna] == 't' || tauler[fila][columna] == 'T')
+            if (posibleLocations[novaFila][novaColum]) {
+                tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre);
+            } else {
+                errorSyso();
+            }
+
+    }
+
+    public void movimentAlfil(char[][] tauler, String color, int fila, int columna, int ronda,
+            int filaTemp, int[] coordenades, boolean[][] blancNegre, String peça, int novaFila, int novaColum,
+            int orientacio, int doblecasella, boolean[][] posibleLocations) {
+
+        // Diagonal amunt esquerra
+        for (int count = 0, f = fila - 1, c = columna - 1; count == 0 && f >= 0 && c >= 0; c--, f--) {
+            if (tauler[f][c] == '-') {
+                posibleLocations[f][c] = true;
+            } else {
+                if (blancNegre[f][c] != blancNegre[fila][columna]) {
+                    posibleLocations[f][c] = true;
+                }
+                count++;
+            }
+        }
+
+        // Diagonal avall dreta
+        for (int count = 0, f = fila + 1, c = columna + 1; count == 0 && f <= 7 && c <= 7; c++, f++) {
+            if (tauler[f][c] == '-') {
+                posibleLocations[f][c] = true;
+            } else {
+                if (blancNegre[f][c] != blancNegre[fila][columna]) {
+                    posibleLocations[f][c] = true;
+                }
+                count++;
+            }
+        }
+
+        // Diagonal amunt dreta
+        for (int count = 0, f = fila - 1, c = columna + 1; count == 0 && f >= 0 && c <= 7; c++, f--) {
+            if (tauler[f][c] == '-') {
+                posibleLocations[f][c] = true;
+            } else {
+                if (blancNegre[f][c] != blancNegre[fila][columna]) {
+                    posibleLocations[f][c] = true;
+                }
+                count++;
+            }
+        }
+
+        // Diagonal avall esquerra
+        for (int count = 0, f = fila + 1, c = columna - 1; count == 0 && f <= 7 && c >= 0; c--, f++) {
+            if (tauler[f][c] == '-') {
+                posibleLocations[f][c] = true;
+            } else {
+                if (blancNegre[f][c] != blancNegre[fila][columna]) {
+                    posibleLocations[f][c] = true;
+                }
+                count++;
+            }
+        }
+
         if (posibleLocations[novaFila][novaColum]) {
             tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre);
         } else {
             errorSyso();
         }
-
     }
+
+    public void movimentReina(char[][] tauler, String color, int fila, int columna, int ronda,
+            int filaTemp, int[] coordenades, boolean[][] blancNegre, String peça, int novaFila, int novaColum,
+            int orientacio, int doblecasella, boolean[][] posibleLocations) {
+        movimentTorre(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, peça, novaFila,
+                novaColum, orientacio, doblecasella, posibleLocations);
+        movimentAlfil(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, peça, novaFila, novaColum,
+                orientacio, doblecasella, posibleLocations);
+    }
+
+    public void movimentCavall(char[][] tauler, String color, int fila, int columna, int ronda,
+            int filaTemp, int[] coordenades, boolean[][] blancNegre, String peça, int novaFila, int novaColum,
+            int orientacio, int doblecasella, boolean[][] posibleLocations) {
+
+        if (fila + 2 <= 7 && columna + 1 <= 7) {
+            if (tauler[fila + 2][columna + 1] == '-'
+                    || blancNegre[fila + 2][columna + 1] != blancNegre[fila][columna]) {
+                posibleLocations[fila + 2][columna + 1] = true;
+            }
+        }
+
+        if (fila + 2 <= 7 && columna - 1 >= 0) {
+            if (tauler[fila + 2][columna - 1] == '-'
+                    || blancNegre[fila + 2][columna - 1] != blancNegre[fila][columna]) {
+                posibleLocations[fila + 2][columna - 1] = true;
+            }
+        }
+
+        if (fila - 2 >= 0 && columna + 1 <= 7) {
+            if (tauler[fila - 2][columna + 1] == '-'
+                    || blancNegre[fila - 2][columna + 1] != blancNegre[fila][columna]) {
+                posibleLocations[fila - 2][columna + 1] = true;
+            }
+        }
+
+        if (fila - 2 >= 0 && columna - 1 >= 0) {
+            if (tauler[fila - 2][columna - 1] == '-'
+                    || blancNegre[fila - 2][columna - 1] != blancNegre[fila][columna]) {
+                posibleLocations[fila - 2][columna - 1] = true;
+            }
+        }
+
+        if (fila + 1 <= 7 && columna + 2 <= 7) {
+            if (tauler[fila + 1][columna + 2] == '-'
+                    || blancNegre[fila + 1][columna + 2] != blancNegre[fila][columna]) {
+                posibleLocations[fila + 1][columna + 2] = true;
+            }
+        }
+
+        if (fila + 1 <= 7 && columna - 2 >= 0) {
+            if (tauler[fila + 1][columna - 2] == '-'
+                    || blancNegre[fila + 1][columna - 2] != blancNegre[fila][columna]) {
+                posibleLocations[fila + 1][columna - 2] = true;
+            }
+        }
+
+        if (fila - 1 >= 0 && columna + 2 <= 7) {
+            if (tauler[fila - 1][columna + 2] == '-'
+                    || blancNegre[fila - 1][columna + 2] != blancNegre[fila][columna]) {
+                posibleLocations[fila - 1][columna + 2] = true;
+            }
+        }
+
+        if (fila - 1 >= 0 && columna - 2 >= 0) {
+            if (tauler[fila - 1][columna - 2] == '-'
+                    || blancNegre[fila - 1][columna - 2] != blancNegre[fila][columna]) {
+                posibleLocations[fila - 1][columna - 2] = true;
+            }
+        }
+
+        if (posibleLocations[novaFila][novaColum]) {
+            tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre);
+        } else {
+            errorSyso();
+        }
+    }
+
+    public void movimentRei(char[][] tauler, String color, int fila, int columna, int ronda,
+            int filaTemp, int[] coordenades, boolean[][] blancNegre, String peça, int novaFila, int novaColum,
+            int orientacio, int doblecasella, boolean[][] posibleLocations) {
+        for (int c = columna - 1; c <= columna + 1; c++) {
+            for (int f = fila - 1; f <= fila + 1; f++) {
+                if (f >= 0 && f <= 7 && c >= 0 && c <= 7) {
+                    if (!(f == fila && c == columna)) {
+                        if (tauler[f][c] == '-' || blancNegre[f][c] != blancNegre[fila][columna]) {
+                            posibleLocations[f][c] = true;
+                        }
+                    }
+                }
+            }
+        }
+        if (posibleLocations[novaFila][novaColum]) {
+            tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre);
+        } else {
+            errorSyso();
+        }
+    }
+
 }
