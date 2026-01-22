@@ -21,17 +21,38 @@ public class PE7EscacsPolH {
         int n =0;
         String[] noms = new String[2];
         demanarNoms(noms, n);
-        jugar(tauler, blancNegre, n);
+        jugar(tauler, blancNegre, n, noms);
 
     }
 public void demanarNoms(String[] noms, int n){
-     String entrada ="";
+    String nomTemp = "";
+    String triarColor = "";
+    for(int c =0; c<noms.length; c++){
+        noms[c]="empty";
+    }
+    boolean error = false;
+    for(int c=0;c<noms.length;c++){
     System.out.print("Indica el teu nom: ");
-    entrada = scanner.nextLine();
-    System.out.println("Quines peces vols jugar? (blanques/negres): ");
-    
+    nomTemp = tryCatchString();
+    do {
+        error=false;
+        System.out.println("Quines peces vols jugar? (blanques/negres): ");
+        triarColor = tryCatchString();
+        if(triarColor.equalsIgnoreCase("blanques")&&noms[0].equals("empty")){
+            noms[0]=nomTemp;
+        }
+        else if(triarColor.equalsIgnoreCase("negres")&&noms[1].equals("empty")){
+            noms[1]=nomTemp;
+        } 
+        else{
+            System.out.println("Tria un color vàlid o que no s'hagi triat previament");
+            error=true;
+        }
+    } while (error);
+   
+    }
 }
-    public void jugar(char[][] tauler, boolean[][] blancNegre, int n) {
+    public void jugar(char[][] tauler, boolean[][] blancNegre, int n, String[]noms ) {
         
         int ronda = 1;
         String torn = "";
@@ -52,7 +73,7 @@ public void demanarNoms(String[] noms, int n){
                 torn = "blanc";
                 n=0;
             }
-            System.out.println("Torn de: " + torn);
+            System.out.println("Torn de " +noms[n]+ " jugador " + torn);
             System.out.print("Introdueix coordenada (ex: 2H): ");
 
             boolean errorColor = false;
@@ -559,5 +580,34 @@ public void demanarNoms(String[] noms, int n){
         } 
         }
         return countKings;
+    }
+
+    public String tryCatchString(){
+        String input = "";
+    boolean error = false;
+    
+    do {
+        error= false;
+        try {
+         input = scanner.nextLine(); 
+         if(input.length()<1){
+            System.out.println("Introdueix un nom");
+            error = true;
+         }
+            
+        } catch (java.util.InputMismatchException e) {
+            System.out.println("Error: entrada invàlida");
+            System.out.print("> ");
+           
+            error = true;
+        } catch (Exception e) {
+            System.out.println("Error inesperat");
+            System.out.print("> ");
+            error = true;
+        }
+        
+    } while (error);
+    
+    return input;
     }
 }
