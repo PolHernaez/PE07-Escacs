@@ -18,26 +18,39 @@ public class PE7EscacsPolH {
         char[][] tauler = new char[8][8];
         boolean[][] blancNegre = new boolean[8][8]; // true=blanc false=negre
         inserirPeces(tauler, blancNegre);
-
-        jugar(tauler, blancNegre);
+        int n =0;
+        String[] noms = new String[2];
+        demanarNoms(noms, n);
+        jugar(tauler, blancNegre, n);
 
     }
-
-    public void jugar(char[][] tauler, boolean[][] blancNegre) {
+public void demanarNoms(String[] noms, int n){
+     String entrada ="";
+    System.out.print("Indica el teu nom: ");
+    entrada = scanner.nextLine();
+    System.out.println("Quines peces vols jugar? (blanques/negres): ");
+    
+}
+    public void jugar(char[][] tauler, boolean[][] blancNegre, int n) {
+        
         int ronda = 1;
         String torn = "";
-        boolean actiu = true;
+       
         int filaTemp = 0;
         int columna = 0;
         int fila = 0;
         String color = "";
-        while (actiu) {
+        int countKings =0;
+        do{
+        
             imprimirTauler(tauler);
             modeCasella = 0;
             if (ronda % 2 == 0) {
                 torn = "negre";
+                n=1;
             } else {
                 torn = "blanc";
+                n=0;
             }
             System.out.println("Torn de: " + torn);
             System.out.print("Introdueix coordenada (ex: 2H): ");
@@ -65,8 +78,11 @@ public class PE7EscacsPolH {
 
             moviments(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, peça);
             ronda++;
-        }
-
+            countKings = estatRei(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, color, fila, columna, columna, fila, blancNegre, countKings);
+        
+    }while (countKings==2);
+    
+     System.out.println("El joc ha acabat, "+ color + " ha guanyat!");
     }
 
     public void inserirPeces(char[][] tauler, boolean[][] blancNegre) {
@@ -217,10 +233,11 @@ public class PE7EscacsPolH {
 
         do {
             String entrada = scanner.nextLine().toUpperCase();
-            System.out.println("Has d'escriure 2 carácters");
-            System.out.print("> ");
+           
             errorCoord = false;
             if (entrada.length() != 2) {
+                 System.out.println("Has d'escriure 2 carácters");
+            System.out.print("> ");
                 errorCoord = true;
             } else {
                 filaTemp = Character.getNumericValue(entrada.charAt(0));
@@ -530,4 +547,17 @@ public class PE7EscacsPolH {
         }
     }
 
+    public int estatRei(char[][] tauler, String color, int fila, int columna, int ronda,
+            int filaTemp, int[] coordenades, boolean[][] blancNegre, String peça, int novaFila, int novaColum,
+            int orientacio, int doblecasella, boolean[][] posibleLocations, int countKings) {
+                countKings=0;
+        for (int f = 0; f < 8; f++) {
+           for (int c = 0; c < 8; c++) {
+            if(tauler[f][c]=='k'||tauler[f][c]=='K'){
+                countKings++;
+            }
+        } 
+        }
+        return countKings;
+    }
 }
