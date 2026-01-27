@@ -12,7 +12,10 @@ public class PE7EscacsPolH {
     boolean errorCoord = false;
     char[] eliminadesBlanques = new char[16];
     char[] eliminadesNegres = new char[16];
-    int count = 0;
+    int countB = 0;
+    int countN = 0;
+    boolean blancElimina = false;
+    boolean negreElimina = false;
 
     public void principal() {
 
@@ -69,7 +72,7 @@ public class PE7EscacsPolH {
         do {
 
             imprimirTauler(tauler);
-
+            imprimirEliminats();
             modeCasella = 0;
             if (ronda % 2 == 0) {
                 torn = "negre";
@@ -592,13 +595,18 @@ public class PE7EscacsPolH {
 
     public void pecesEliminades(char[][] tauler, int novaFila, int novaColum, boolean[][] blancNegre) {
         if (tauler[novaFila][novaColum] != '-') {
+
             if (blancNegre[novaFila][novaColum]) {
-                eliminadesBlanques[count] = tauler[novaFila][novaColum];
+                blancElimina = true;
+                eliminadesBlanques[countB] = tauler[novaFila][novaColum];
+                countB++;
             } else {
-                eliminadesNegres[count] = tauler[novaFila][novaColum];
+                negreElimina = true;
+                eliminadesNegres[countN] = tauler[novaFila][novaColum];
+                countN++;
             }
-            count++;
         }
+
     }
 
     public String tryCatchString() {
@@ -628,5 +636,23 @@ public class PE7EscacsPolH {
         } while (error);
 
         return input;
+    }
+
+    public void imprimirEliminats() {
+        if (blancElimina) {
+            System.out.print("El blanc ha eliminat a: ");
+            for (int c = 0; c < countN; c++) {
+                System.out.println(eliminadesNegres[c] + " ");
+            }
+            System.out.println("");
+        }
+        if (negreElimina) {
+            System.out.print("El negre ha eliminat a: ");
+            for (int c = 0; c < countB; c++) {
+                System.out.println(eliminadesBlanques[c] + " ");
+            }
+            System.out.println("");
+        }
+
     }
 }
