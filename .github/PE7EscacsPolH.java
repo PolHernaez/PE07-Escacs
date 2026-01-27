@@ -16,6 +16,8 @@ public class PE7EscacsPolH {
     int countN = 0;
     boolean blancElimina = false;
     boolean negreElimina = false;
+    boolean sortir = false;
+    boolean errorColor = false;
 
     public void principal() {
 
@@ -84,35 +86,48 @@ public class PE7EscacsPolH {
             System.out.println("Torn de " + noms[n] + " jugador " + torn);
             System.out.print("Introdueix coordenada (ex: 2H): ");
 
-            boolean errorColor = false;
+            errorColor = false;
             int[] coordenades = new int[2]; // Array per guardar fila i columna
             do {
-                errorColor = false;
-                comprovarCasella(filaTemp, columna, fila, tauler, blancNegre, coordenades);
-                fila = coordenades[0];
-                columna = coordenades[1];
+                  errorColor = false;
+    sortir = false; // Reseteja sortir
+    
+    comprovarCasella(filaTemp, columna, fila, tauler, blancNegre, coordenades);
+    fila = coordenades[0];
+    columna = coordenades[1];
 
-                color = blancONegre(blancNegre, fila, columna);
-                System.out.println("La peça seleccionada es " + peça + " " + color);
-                if (!color.equals(torn)) {
-                    System.out.println("Has de seleccionar una peça del teu color!");
-                    System.out.print("> ");
-                    errorColor = true;
-                }
+    color = blancONegre(blancNegre, fila, columna);
+    System.out.println("La peça seleccionada es " + peça + " " + color);
+    if (!color.equals(torn)) {
+        System.out.println("Has de seleccionar una peça del teu color!");
+        System.out.print("> ");
+        errorColor = true;
+    } else {
+        System.out.println("A quina posicio vols moure't? (escriu '00' per tornar a triar)");
+        System.out.print("> ");
 
+        moviments(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, peça);
+        
+        // AFEGIR AIXÒ:
+        if (sortir) {
+            
+            System.out.println("Torna a triar peça:");
+            System.out.print("> ");
+            errorColor = true;
+        }
+    }
             } while (errorColor);
 
-            System.out.println("A quina posicio vols moure't?");
-            System.out.print("> ");
+            
 
-            moviments(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, peça);
+            
             ronda++;
             countKings = estatRei(tauler, countKings);
 
         } while (countKings == 2);
 
-        System.out.println("El joc ha acabat, " + color + " ha guanyat!");
-    }
+        System.out.println("El joc ha acabat, " + color + " ha guanyat!");}
+    
 
     public void inserirPeces(char[][] tauler, boolean[][] blancNegre) {
         /* Inserir espai buit '-' */
@@ -223,16 +238,20 @@ public class PE7EscacsPolH {
                 posibleLocations[f][c] = false;
             }
         }
-        do {
-            errorCoord = false;
-            comprovarCasella(filaTemp, novaColum, novaFila, tauler, blancNegre, coordenades);
+            do {
+        errorCoord = false;
+        sortir = false;
+        comprovarCasella(filaTemp, novaColum, novaFila, tauler, blancNegre, coordenades);
+        
+        // Només continua si NO vol sortir
+        if (!sortir) {
             novaFila = coordenades[0];
             novaColum = coordenades[1];
+            
             if (peça.equals("reina")) {
                 movimentReina(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, peça, novaFila,
                         novaColum, orientacio, doblecasella, posibleLocations);
             }
-
             if (peça.equals("peó")) {
                 movimentPeo(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, peça, novaFila,
                         novaColum, orientacio, doblecasella);
@@ -253,9 +272,10 @@ public class PE7EscacsPolH {
                 movimentRei(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, peça, novaFila,
                         novaColum, orientacio, doblecasella, posibleLocations);
             }
+        }
 
-        } while (errorCoord);
-    }
+    } while (errorCoord && !sortir); // Surt del bucle si sortir = true
+}
 
     public void comprovarCasella(int filaTemp, int columna, int fila, char[][] tauler,
             boolean[][] blancNegre, int[] coordenades) {
@@ -264,6 +284,15 @@ public class PE7EscacsPolH {
             String entrada = scanner.nextLine().toUpperCase();
 
             errorCoord = false;
+
+            if (entrada.equals("00") && modeCasella == 1) {
+                
+                modeCasella = 0;
+                sortir = true;
+                coordenades[0] = -1;
+                coordenades[1] = -1;
+                return;
+            }
             if (entrada.length() != 2) {
                 System.out.println("Has d'escriure 2 carácters");
                 System.out.print("> ");
@@ -642,17 +671,18 @@ public class PE7EscacsPolH {
         if (blancElimina) {
             System.out.print("El blanc ha eliminat a: ");
             for (int c = 0; c < countN; c++) {
-                System.out.println(eliminadesNegres[c] + " ");
+                System.out.print(eliminadesNegres[c] + " ");
             }
             System.out.println("");
         }
         if (negreElimina) {
             System.out.print("El negre ha eliminat a: ");
             for (int c = 0; c < countB; c++) {
-                System.out.println(eliminadesBlanques[c] + " ");
+                System.out.print(eliminadesBlanques[c] + " ");
             }
             System.out.println("");
         }
 
     }
+
 }
