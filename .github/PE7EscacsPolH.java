@@ -10,6 +10,9 @@ public class PE7EscacsPolH {
     String peça = "";
     int modeCasella = 0;
     boolean errorCoord = false;
+    char[] eliminadesBlanques = new char[16];
+    char[] eliminadesNegres = new char[16];
+    int count = 0;
 
     public void principal() {
 
@@ -18,62 +21,64 @@ public class PE7EscacsPolH {
         char[][] tauler = new char[8][8];
         boolean[][] blancNegre = new boolean[8][8]; // true=blanc false=negre
         inserirPeces(tauler, blancNegre);
-        int n =0;
+        int n = 0;
         String[] noms = new String[2];
         demanarNoms(noms, n);
         jugar(tauler, blancNegre, n, noms);
 
     }
-public void demanarNoms(String[] noms, int n){
-    String nomTemp = "";
-    String triarColor = "";
-    for(int c =0; c<noms.length; c++){
-        noms[c]="empty";
-    }
-    boolean error = false;
-    for(int c=0;c<noms.length;c++){
-    System.out.print("Indica el teu nom: ");
-    nomTemp = tryCatchString();
-    do {
-        error=false;
-        System.out.println("Quines peces vols jugar? (blanques/negres): ");
-        triarColor = tryCatchString();
-        if(triarColor.equalsIgnoreCase("blanques")&&noms[0].equals("empty")){
-            noms[0]=nomTemp;
+
+    public void demanarNoms(String[] noms, int n) {
+        String nomTemp = "";
+        String triarColor = "";
+        for (int c = 0; c < noms.length; c++) {
+            noms[c] = "empty";
         }
-        else if(triarColor.equalsIgnoreCase("negres")&&noms[1].equals("empty")){
-            noms[1]=nomTemp;
-        } 
-        else{
-            System.out.println("Tria un color vàlid o que no s'hagi triat previament");
-            error=true;
+        boolean error = false;
+        for (int c = 0; c < noms.length; c++) {
+            System.out.print("Indica el teu nom: ");
+            nomTemp = tryCatchString();
+            do {
+                error = false;
+                System.out.println("Quines peces vols jugar? (blanques/negres): ");
+                triarColor = tryCatchString();
+                if (triarColor.equalsIgnoreCase("blanques") && noms[0].equals("empty")) {
+                    noms[0] = nomTemp;
+                } else if (triarColor.equalsIgnoreCase("negres") && noms[1].equals("empty")) {
+                    noms[1] = nomTemp;
+                } else {
+                    System.out.println("Tria un color vàlid o que no s'hagi triat previament");
+                    error = true;
+                }
+            } while (error);
+
         }
-    } while (error);
-   
     }
-}
-    public void jugar(char[][] tauler, boolean[][] blancNegre, int n, String[]noms ) {
-        
+
+    public void jugar(char[][] tauler, boolean[][] blancNegre, int n, String[] noms) {
+
         int ronda = 1;
         String torn = "";
-       
+
         int filaTemp = 0;
         int columna = 0;
         int fila = 0;
         String color = "";
-        int countKings =0;
-        do{
-        
+        int countKings = 0;
+
+        do {
+
             imprimirTauler(tauler);
+
             modeCasella = 0;
             if (ronda % 2 == 0) {
                 torn = "negre";
-                n=1;
+                n = 1;
             } else {
                 torn = "blanc";
-                n=0;
+                n = 0;
             }
-            System.out.println("Torn de " +noms[n]+ " jugador " + torn);
+            System.out.println("Torn de " + noms[n] + " jugador " + torn);
             System.out.print("Introdueix coordenada (ex: 2H): ");
 
             boolean errorColor = false;
@@ -99,11 +104,11 @@ public void demanarNoms(String[] noms, int n){
 
             moviments(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, peça);
             ronda++;
-            countKings = estatRei(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, color, fila, columna, columna, fila, blancNegre, countKings);
-        
-    }while (countKings==2);
-    
-     System.out.println("El joc ha acabat, "+ color + " ha guanyat!");
+            countKings = estatRei(tauler, countKings);
+
+        } while (countKings == 2);
+
+        System.out.println("El joc ha acabat, " + color + " ha guanyat!");
     }
 
     public void inserirPeces(char[][] tauler, boolean[][] blancNegre) {
@@ -254,11 +259,11 @@ public void demanarNoms(String[] noms, int n){
 
         do {
             String entrada = scanner.nextLine().toUpperCase();
-           
+
             errorCoord = false;
             if (entrada.length() != 2) {
-                 System.out.println("Has d'escriure 2 carácters");
-            System.out.print("> ");
+                System.out.println("Has d'escriure 2 carácters");
+                System.out.print("> ");
                 errorCoord = true;
             } else {
                 filaTemp = Character.getNumericValue(entrada.charAt(0));
@@ -338,6 +343,7 @@ public void demanarNoms(String[] noms, int n){
             if (novaFila == filaCanvi) {
                 tauler[fila][columna] = qoQ;
             }
+            pecesEliminades(tauler, novaFila, novaColum, blancNegre);
             tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre);
         } else {
             errorSyso();
@@ -405,6 +411,7 @@ public void demanarNoms(String[] noms, int n){
         // Comprovar si el moviment és vàlid
         if (tauler[fila][columna] == 't' || tauler[fila][columna] == 'T')
             if (posibleLocations[novaFila][novaColum]) {
+                pecesEliminades(tauler, novaFila, novaColum, blancNegre);
                 tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre);
             } else {
                 errorSyso();
@@ -465,6 +472,7 @@ public void demanarNoms(String[] noms, int n){
         }
 
         if (posibleLocations[novaFila][novaColum]) {
+            pecesEliminades(tauler, novaFila, novaColum, blancNegre);
             tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre);
         } else {
             errorSyso();
@@ -541,6 +549,7 @@ public void demanarNoms(String[] noms, int n){
         }
 
         if (posibleLocations[novaFila][novaColum]) {
+            pecesEliminades(tauler, novaFila, novaColum, blancNegre);
             tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre);
         } else {
             errorSyso();
@@ -562,52 +571,62 @@ public void demanarNoms(String[] noms, int n){
             }
         }
         if (posibleLocations[novaFila][novaColum]) {
+            pecesEliminades(tauler, novaFila, novaColum, blancNegre);
             tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre);
         } else {
             errorSyso();
         }
     }
 
-    public int estatRei(char[][] tauler, String color, int fila, int columna, int ronda,
-            int filaTemp, int[] coordenades, boolean[][] blancNegre, String peça, int novaFila, int novaColum,
-            int orientacio, int doblecasella, boolean[][] posibleLocations, int countKings) {
-                countKings=0;
+    public int estatRei(char[][] tauler, int countKings) {
+        countKings = 0;
         for (int f = 0; f < 8; f++) {
-           for (int c = 0; c < 8; c++) {
-            if(tauler[f][c]=='k'||tauler[f][c]=='K'){
-                countKings++;
+            for (int c = 0; c < 8; c++) {
+                if (tauler[f][c] == 'k' || tauler[f][c] == 'K') {
+                    countKings++;
+                }
             }
-        } 
         }
         return countKings;
     }
 
-    public String tryCatchString(){
-        String input = "";
-    boolean error = false;
-    
-    do {
-        error= false;
-        try {
-         input = scanner.nextLine(); 
-         if(input.length()<1){
-            System.out.println("Introdueix un nom");
-            error = true;
-         }
-            
-        } catch (java.util.InputMismatchException e) {
-            System.out.println("Error: entrada invàlida");
-            System.out.print("> ");
-           
-            error = true;
-        } catch (Exception e) {
-            System.out.println("Error inesperat");
-            System.out.print("> ");
-            error = true;
+    public void pecesEliminades(char[][] tauler, int novaFila, int novaColum, boolean[][] blancNegre) {
+        if (tauler[novaFila][novaColum] != '-') {
+            if (blancNegre[novaFila][novaColum]) {
+                eliminadesBlanques[count] = tauler[novaFila][novaColum];
+            } else {
+                eliminadesNegres[count] = tauler[novaFila][novaColum];
+            }
+            count++;
         }
-        
-    } while (error);
-    
-    return input;
+    }
+
+    public String tryCatchString() {
+        String input = "";
+        boolean error = false;
+
+        do {
+            error = false;
+            try {
+                input = scanner.nextLine();
+                if (input.length() < 1) {
+                    System.out.println("Introdueix un nom");
+                    error = true;
+                }
+
+            } catch (java.util.InputMismatchException e) {
+                System.out.println("Error: entrada invàlida");
+                System.out.print("> ");
+
+                error = true;
+            } catch (Exception e) {
+                System.out.println("Error inesperat");
+                System.out.print("> ");
+                error = true;
+            }
+
+        } while (error);
+
+        return input;
     }
 }
