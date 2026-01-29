@@ -1,6 +1,5 @@
 import java.util.Scanner;
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 
 public class PE7EscacsPolH {
     public static void main(String[] args) {
@@ -163,18 +162,19 @@ public class PE7EscacsPolH {
                 System.out.println("Partida abandonada!");
             } else {
                 System.out.println("El joc ha acabat, " + color + " ha guanyat!");
-                System.out.println("\n=== RESUM DE MOVIMENTS ===");
-                System.out.println("\nMoviments Blanques:");
-                for (int i = 0; i < movimentsBlanc.size(); i++) {
-                    System.out.println((i + 1) + ". " + movimentsBlanc.get(i));
-                }
-
-                System.out.println("\nMoviments Negres:");
-                for (int i = 0; i < movimentsNegre.size(); i++) {
-                    System.out.println((i + 1) + ". " + movimentsNegre.get(i));
-                }
-                System.out.println("=========================\n");
             }
+            System.out.println("\n=== RESUM DE MOVIMENTS ===");
+            System.out.println("\nMoviments Blanques:");
+            for (int i = 0; i < movimentsBlanc.size(); i++) {
+                System.out.println((i + 1) + ". " + movimentsBlanc.get(i));
+            }
+
+            System.out.println("\nMoviments Negres:");
+            for (int i = 0; i < movimentsNegre.size(); i++) {
+                System.out.println((i + 1) + ". " + movimentsNegre.get(i));
+            }
+            System.out.println("");
+            System.out.println("=========================\n");
 
             boolean respostaValida = false;
             do {
@@ -421,7 +421,7 @@ public class PE7EscacsPolH {
     }
 
     public void tramitCanvis(char[][] tauler, int novaFila, int novaColum, int fila, int columna,
-            boolean[][] blancNegre) {
+            boolean[][] blancNegre, String peça) {
         String origen = convertirCoord(fila, columna);
         String desti = convertirCoord(novaFila, novaColum);
         String moviment = peça + " de " + origen + " a " + desti;
@@ -481,7 +481,7 @@ public class PE7EscacsPolH {
                 tauler[fila][columna] = qoQ;
             }
             pecesEliminades(tauler, novaFila, novaColum, blancNegre);
-            tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre);
+            tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre, peça);
         } else {
             errorSyso();
         }
@@ -549,7 +549,7 @@ public class PE7EscacsPolH {
         if (tauler[fila][columna] == 't' || tauler[fila][columna] == 'T')
             if (posibleLocations[novaFila][novaColum]) {
                 pecesEliminades(tauler, novaFila, novaColum, blancNegre);
-                tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre);
+                tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre, peça);
             } else {
                 errorSyso();
             }
@@ -610,7 +610,7 @@ public class PE7EscacsPolH {
 
         if (posibleLocations[novaFila][novaColum]) {
             pecesEliminades(tauler, novaFila, novaColum, blancNegre);
-            tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre);
+            tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre, peça);
         } else {
             errorSyso();
         }
@@ -687,7 +687,7 @@ public class PE7EscacsPolH {
 
         if (posibleLocations[novaFila][novaColum]) {
             pecesEliminades(tauler, novaFila, novaColum, blancNegre);
-            tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre);
+            tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre, peça);
         } else {
             errorSyso();
         }
@@ -709,7 +709,7 @@ public class PE7EscacsPolH {
         }
         if (posibleLocations[novaFila][novaColum]) {
             pecesEliminades(tauler, novaFila, novaColum, blancNegre);
-            tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre);
+            tramitCanvis(tauler, novaFila, novaColum, fila, columna, blancNegre, peça);
         } else {
             errorSyso();
         }
@@ -753,6 +753,7 @@ public class PE7EscacsPolH {
                 input = scanner.nextLine().toUpperCase();
                 if (input.length() < 1) {
                     System.out.println("Introdueix un nom");
+                    System.out.print("> ");
                     error = true;
                 }
 
@@ -788,26 +789,6 @@ public class PE7EscacsPolH {
             System.out.println("");
         }
 
-    }
-
-    public int llegrInt() {
-        boolean ok = true;
-        int entrada = 0;
-        do {
-            ok = true;
-            entrada = 0;
-            try {
-                entrada = scanner.nextInt();
-            } catch (InputMismatchException e) {
-                System.out.println("Error en el tipus d'entrada");
-                ok = false;
-            } catch (Exception e) {
-                System.out.println("Error inesperat, torna a provar-ho");
-                ok = false;
-            }
-
-        } while (!ok);
-        return entrada;
     }
 
     public String convertirCoord(int fila, int columna) {
