@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 
 public class PE7EscacsPolH {
@@ -20,7 +21,8 @@ public class PE7EscacsPolH {
     boolean sortir = false;
     boolean errorColor = false;
     boolean abandonar = false;
-
+    ArrayList<String> movimentsBlanc = new ArrayList<>();
+    ArrayList<String> movimentsNegre = new ArrayList<>();
 
     public void principal() {
 
@@ -84,6 +86,9 @@ public class PE7EscacsPolH {
             negreElimina = false;
             tornarJugar = false;
             abandonar = false;
+            abandonar = false;
+            movimentsBlanc.clear();
+            movimentsNegre.clear();
             // Per esborrar tot en cas de tornar a començar partida
             for (int i = 0; i < 16; i++) {
                 eliminadesBlanques[i] = '\0';
@@ -104,7 +109,7 @@ public class PE7EscacsPolH {
                     torn = "blanc";
                     n = 0;
                 }
-                
+
                 System.out.println("Torn de " + noms[n] + " jugador " + torn);
                 System.out.println("Per abandonar escriu 'abandonar'");
                 System.out.print("Introdueix coordenada (ex: 2H): ");
@@ -112,48 +117,64 @@ public class PE7EscacsPolH {
                 errorColor = false;
                 int[] coordenades = new int[2]; // Array per guardar fila i columna
                 do {
-    errorColor = false;
-    sortir = false;
+                    errorColor = false;
+                    sortir = false;
 
-    comprovarCasella(filaTemp, columna, fila, tauler, blancNegre, coordenades, countKings);
-    
-    if (!abandonar) {  
-        fila = coordenades[0];
-        columna = coordenades[1];
+                    comprovarCasella(filaTemp, columna, fila, tauler, blancNegre, coordenades, countKings);
 
-        color = blancONegre(blancNegre, fila, columna);
-        System.out.println("La peça seleccionada es " + peça + " " + color);
-        
-        if (!color.equals(torn)) {
-            System.out.println("Has de seleccionar una peça del teu color!");
-            System.out.print("> ");
-            errorColor = true;
-        } else {
-            System.out.println("A quina posicio vols moure't? (escriu '00' per tornar a triar)");
-            System.out.print("> ");
+                    if (!abandonar) {
 
-            moviments(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, peça, countKings);
+                        fila = coordenades[0];
+                        columna = coordenades[1];
 
-            if (sortir) {
-                System.out.println("Torna a triar peça:");
-                System.out.print("> ");
-                errorColor = true;
-            }
-        }
-    }
-} while (errorColor && !abandonar);
+                        color = blancONegre(blancNegre, fila, columna);
+
+                        System.out.println("La peça seleccionada es " + peça + " " + color);
+
+                        if (!color.equals(torn)) {
+                            System.out.println("Has de seleccionar una peça del teu color!");
+                            System.out.print("> ");
+                            errorColor = true;
+                        } else {
+                            System.out.println("A quina posicio vols moure't? (escriu '00' per tornar a triar)");
+                            System.out.print("> ");
+
+                            moviments(tauler, color, fila, columna, ronda, filaTemp, coordenades, blancNegre, peça,
+                                    countKings);
+
+                            if (sortir) {
+                                System.out.println("Torna a triar peça:");
+                                System.out.print("> ");
+                                errorColor = true;
+                            }
+                        }
+                    }
+
+                } while (errorColor && !abandonar);
 
                 ronda++;
                 countKings = estatRei(tauler, countKings);
-
+                if (countKings != 2) {
+                    abandonar = true;
+                }
             } while (countKings == 2 && !abandonar);
 
-           
-    if (abandonar) {
-        System.out.println("Partida abandonada!");
-    } else {
-        System.out.println("El joc ha acabat, " + color + " ha guanyat!");
-    }
+            if (abandonar && countKings == 2) {
+                System.out.println("Partida abandonada!");
+            } else {
+                System.out.println("El joc ha acabat, " + color + " ha guanyat!");
+                System.out.println("\n=== RESUM DE MOVIMENTS ===");
+                System.out.println("\nMoviments Blanques:");
+                for (int i = 0; i < movimentsBlanc.size(); i++) {
+                    System.out.println((i + 1) + ". " + movimentsBlanc.get(i));
+                }
+
+                System.out.println("\nMoviments Negres:");
+                for (int i = 0; i < movimentsNegre.size(); i++) {
+                    System.out.println((i + 1) + ". " + movimentsNegre.get(i));
+                }
+                System.out.println("=========================\n");
+            }
 
             boolean respostaValida = false;
             do {
@@ -348,59 +369,68 @@ public class PE7EscacsPolH {
         } while (errorCoord && !sortir); // Surt del bucle si sortir = true
     }
 
-   public void comprovarCasella(int filaTemp, int columna, int fila, char[][] tauler,
-        boolean[][] blancNegre, int[] coordenades, int countKings) {
+    public void comprovarCasella(int filaTemp, int columna, int fila, char[][] tauler,
+            boolean[][] blancNegre, int[] coordenades, int countKings) {
 
-         do {
-        String entrada = tryCatchString();
-        errorCoord = false;
-        
-        if (entrada.equalsIgnoreCase("ABANDONAR")) {
-            System.out.println("Has abandonat la partida!");
-            abandonar = true;
-            coordenades[0] = -1;
-            coordenades[1] = -1;
-            errorCoord = false; // Surt del bucle
-        } else if (entrada.equals("00") && modeCasella == 1) {
-            modeCasella = 0;
-            sortir = true;
-            coordenades[0] = -1;
-            coordenades[1] = -1;
-            errorCoord = false; // Surt del bucle
-        } else if (entrada.length() != 2) {
-            System.out.println("Has d'escriure 2 carácters");
-            System.out.print("> ");
-            errorCoord = true;
-        } else {
-            filaTemp = Character.getNumericValue(entrada.charAt(0));
-            columna = entrada.charAt(1) - 'A';
-            fila = 8 - filaTemp;
+        do {
+            String entrada = tryCatchString();
+            errorCoord = false;
 
-            if (fila < 0 || fila > 7 || columna < 0 || columna > 7) {
-                System.out.println("Introdueix entre '1A' i '8H'");
+            if (entrada.equalsIgnoreCase("ABANDONAR")) {
+                System.out.println("Has abandonat la partida!");
+                abandonar = true;
+                coordenades[0] = -1;
+                coordenades[1] = -1;
+                errorCoord = false; // Surt del bucle
+            } else if (entrada.equals("00") && modeCasella == 1) {
+                modeCasella = 0;
+                sortir = true;
+                coordenades[0] = -1;
+                coordenades[1] = -1;
+                errorCoord = false; // Surt del bucle
+            } else if (entrada.length() != 2) {
+                System.out.println("Has d'escriure 2 carácters");
                 System.out.print("> ");
                 errorCoord = true;
             } else {
-                peça = identificarPeça(tauler, fila, columna);
-                if (modeCasella == 0) {
-                    if (peça.equals("null")) {
-                        System.out.println("L'ubicació seleccionada està buida, torna a triar.");
-                        System.out.print("> ");
-                        errorCoord = true;
-                    } else {
-                        modeCasella++;
+                filaTemp = Character.getNumericValue(entrada.charAt(0));
+                columna = entrada.charAt(1) - 'A';
+                fila = 8 - filaTemp;
+
+                if (fila < 0 || fila > 7 || columna < 0 || columna > 7) {
+                    System.out.println("Introdueix entre '1A' i '8H'");
+                    System.out.print("> ");
+                    errorCoord = true;
+                } else {
+                    peça = identificarPeça(tauler, fila, columna);
+                    if (modeCasella == 0) {
+                        if (peça.equals("null")) {
+                            System.out.println("L'ubicació seleccionada està buida, torna a triar.");
+                            System.out.print("> ");
+                            errorCoord = true;
+                        } else {
+                            modeCasella++;
+                        }
                     }
                 }
             }
-        }
-    } while (errorCoord && !abandonar);
+        } while (errorCoord && !abandonar);
 
-    coordenades[0] = fila;
-    coordenades[1] = columna;
+        coordenades[0] = fila;
+        coordenades[1] = columna;
     }
 
     public void tramitCanvis(char[][] tauler, int novaFila, int novaColum, int fila, int columna,
             boolean[][] blancNegre) {
+        String origen = convertirCoord(fila, columna);
+        String desti = convertirCoord(novaFila, novaColum);
+        String moviment = peça + " de " + origen + " a " + desti;
+
+        if (blancNegre[fila][columna]) {
+            movimentsBlanc.add(moviment);
+        } else {
+            movimentsNegre.add(moviment);
+        }
         tauler[novaFila][novaColum] = tauler[fila][columna];
         tauler[fila][columna] = '-';
         blancNegre[novaFila][novaColum] = blancNegre[fila][columna];
@@ -780,4 +810,9 @@ public class PE7EscacsPolH {
         return entrada;
     }
 
+    public String convertirCoord(int fila, int columna) {
+        int filaUsuari = 8 - fila;
+        char columnaUsuari = (char) ('A' + columna);
+        return filaUsuari + "" + columnaUsuari;
+    }
 }
